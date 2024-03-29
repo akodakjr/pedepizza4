@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pede Pizza</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f2f2f2;
+    }
+    .container {
+        max-width: 600px;
+        margin: 20px auto;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+        text-align: center;
+    }
+    button {
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 10px;
+    }
+    button:hover {
+        background-color: #0056b3;
+    }
+    label {
+        display: block;
+        margin-bottom: 5px;
+    }
+    input[type="text"],
+    input[type="number"],
+    input[type="tel"],
+    select {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+        margin-bottom: 10px;
+    }
+    .grid-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+    .grid-item {
+        grid-column: span 1;
+    }
+    .pedido-item {
+        margin-bottom: 10px;
+    }
+    #resumo-pedido {
+        margin-top: 20px;
+        padding: 10px;
+        background-color: #f2f2f2;
+        border-radius: 5px;
+        white-space: pre-wrap;
+    }
+    #subtotal-pedido,
+    #total-pedido,
+    #taxa-entrega {
+        font-weight: bold;
+        text-align: right;
+    }
+    .error-message {
+        color: red;
+        margin-top: 5px;
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>Pede Pizza</h1>
+
+    <div id="cliente">
+        <h3>Informações do Cliente:</h3>
+        <div class="grid-container">
+            <div class="grid-item">
+                <label for="nome">Nome:</label>
+                <input type="text" id="nome" placeholder="Digite seu nome..." required>
+            </div>
+            <div class="grid-item">
+                <label for="telefone">Telefone:</label>
+                <input type="tel" id="telefone" placeholder="Digite seu telefone..." required>
+            </div>
+            <div class="grid-item">
+                <label for="endereco">Endereço:</label>
+                <input type="text" id="endereco" placeholder="Digite seu endereço..." required>
+            </div>
+            <div class="grid-item">
+                <label for="bairro">Bairro:</label>
+                <select id="bairro" required onchange="atualizarTaxaEntrega()">
+                    <option value="">Selecione o bairro</option>
+                    <option value="nova-maraba" data-taxa="5">Nova Marabá (Taxa: R$ 5,00)</option>
+                    <option value="cidade-nova" data-taxa="7">Cidade Nova (Taxa: R$ 7,00)</option>
+                </select>
+            </div>
+        </div>
+        <button type="button" onclick="adicionarInfoEntrega()">Adicionar Informações de Entrega</button>
+    </div>
+
+    <div id="pizzas">
+        <h3>Escolha até 2 sabores:</h3>
+        <div class="grid-container">
+            <div class="grid-item">
+                <label for="sabor1">Sabor 1:</label>
+                <select id="sabor1" name="sabor1" required onchange="mostrarDescricao(this)">
+                    <option value="">Selecione um sabor</option>
+                    <option value="Calabresa|20.00" data-descricao="Calabresa com cebola, molho de tomate e queijo.">Calabresa - R$ 20,00</option>
+                    <option value="Frango|25.00" data-descricao="Frango desfiado, milho, molho de tomate e queijo.">Frango - R$ 25,00</option>
+                    <option value="Marguerita|22.00" data-descricao="Molho de tomate, queijo, manjericão e tomate.">Marguerita - R$ 22,00</option>
+                    <!-- Adicione mais opções de sabores aqui -->
+                </select>
+            </div>
+            <div class="grid-item">
+                <label for="sabor2">Sabor 2:</label>
+                <select id="sabor2" name="sabor2" onchange="mostrarDescricao(this)">
+                    <option value="">Selecione um sabor</option>
+                    <option value="Calabresa|20.00" data-descricao="Calabresa com cebola, molho de tomate e queijo.">Calabresa - R$ 20,00</option>
+                    <option value="Frango|25.00" data-descricao="Frango desfiado, milho, molho de tomate e queijo.">Frango - R$ 25,00</option>
+                    <option value="Marguerita|22.00" data-descricao="Molho de tomate, queijo, manjericão e tomate.">Marguerita - R$ 22,00</option>
+                    <!-- Adicione mais opções de sabores aqui -->
+                </select>
+            </div>
+            <div class="grid-item">
+                <label for="borda">Borda:</label>
+                <select id="borda" name="borda">
+                    <option value="">Sem borda</option>
+                    <option value="Catupiry|5.00">Borda com Catupiry - R$ 5,00</option>
+                </select>
+            </div>
+        </div>
+        <button type="button" onclick="validarAdicaoPizza()">Adicionar ao Pedido</button>
+        <button type="button" onclick="girarSorte()">Girar a Roda da Sorte</button>
+    </div>
+
+    <div id="bebidas">
+        <h3>Escolha a bebida:</h3>
+        <div class="grid-container">
+            <div class="grid-item">
+                <label for="select-bebida">Bebida:</label>
+                <select id="select-bebida">
+                    <option value="">Selecione uma bebida</option>
+                    <option value="Coca-Cola|5.00">Coca-Cola - R$ 5,00</option>
+                    <option value="Guaraná|4.00">Guaraná - R$ 4,00</option>
+                    <!-- Adicione mais opções de bebidas aqui -->
+                </select>
+                <div class="error-message" id="bebida-error-message" style="display: none;">Por favor, selecione uma bebida.</div>
+            </div>
+            <div class="grid-item">
+                <label for="quantidade-bebida">Quantidade:</label>
+                <input type="number" id="quantidade-bebida" min="1" value="1">
+            </div>
+        </div>
+        <button type="button" onclick="adicionarBebida()">Adicionar Bebida</button>
+    </div>
+
+    <button type="button" onclick="calcularTotalPedido()">Finalizar Pedido e Copiar</button>
+    <button type="button" onclick="enviarPedidoWhatsApp()">Enviar Resumo via WhatsApp</button>
+
+    <div id="resumo-pedido"></div>
+    <div id="subtotal-pedido"></div>
+    <div id="total-pedido"></div>
+    <div id="taxa-entrega"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+    <script>
+        // Initialize Firebase
+        const firebaseConfig = {
+            apiKey: "755174777301AIzaSyBbeWW6_NXLMC6AozEcWKpDsO32ti4GYj8",
+            authDomain: "pede-pizza-e1414.firebaseapp.com",
+            databaseURL: "https://pede-pizza-e1414-default-rtdb.firebaseio.com",
+            projectId: "pede-pizza-e1414",
+            storageBucket: "pede-pizza-e1414.appspot.com",
+            messagingSenderId: "755174777301",
+            appId: "1:755174777301:web:578efbd50bc28d72365d5c"
+        };
+        firebase.initializeApp(firebaseConfig);
+
+        // Referência ao nó 'pedidos' do Firebase Realtime Database
+        const database = firebase.database().ref('pedidos');
+
+        // Listener para os novos pedidos adicionados
+        database.on('child_added', function(data) {
+            const pedido = data.val();
+            // Atualize seu painel com o novo pedido
+            // Você pode usar DOM manipulation ou um framework como React ou Vue.js
+        });
+
+        let descontoAplicado = false;
+        let subtotalPedido = 0;
+        let taxaEntrega = 0;
+        let descontoGiroDaSorte = 0;
+
+        // Restante do seu código JavaScript aqui...
+    </script>
+</div>
+</body>
+</html>
